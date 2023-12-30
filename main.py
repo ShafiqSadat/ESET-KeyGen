@@ -129,7 +129,7 @@ if __name__ == '__main__':
             output_line = f'\n🔸 Product: ||{license_name}||\n🕐 Expire: ||{license_out_date}||\n🔐 License: `{license_key}`\n'
             output_filename = 'ESET KEYS.txt'
             if is_bot is True:
-                bot.send_message(-1001219056300, output_line + "\n@LicenseForAll")
+                bot.send_message(-1001219056300, output_line + "@LicenseForAll")
         logger.console_log(output_line)
         date = datetime.datetime.now()
         f = open(f"{str(date.day)}.{str(date.month)}.{str(date.year)} - "+output_filename, 'a')
