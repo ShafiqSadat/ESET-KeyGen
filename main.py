@@ -5,9 +5,7 @@ LOGO = """
 ██╔══╝  ╚════██║██╔══╝     ██║      ██╔═██╗ ██╔══╝    ╚██╔╝  ██║   ██║██╔══╝  ██║╚██╗██║   
 ███████╗███████║███████╗   ██║      ██║  ██╗███████╗   ██║   ╚██████╔╝███████╗██║ ╚████║   
 ╚══════╝╚══════╝╚══════╝   ╚═╝      ╚═╝  ╚═╝╚══════╝   ╚═╝    ╚═════╝ ╚══════╝╚═╝  ╚═══╝                                                                      
-                                                Project Version: v1.1.1.0
-                                                Project Devs: rzc0d3r, AdityaGarg8, k0re,
-                                                              Fasjeit, alejanpa17
+                                                https://t.me/LicenseForAll
 """
 
 import modules.chrome_driver_installer as chrome_driver_installer
