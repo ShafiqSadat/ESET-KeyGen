@@ -1,3 +1,5 @@
+import telebot
+
 LOGO = """
 ███████╗███████╗███████╗████████╗   ██╗  ██╗███████╗██╗   ██╗ ██████╗ ███████╗███╗   ██╗  
 ██╔════╝██╔════╝██╔════╝╚══██╔══╝   ██║ ██╔╝██╔════╝╚██╗ ██╔╝██╔════╝ ██╔════╝████╗  ██║   
@@ -20,7 +22,7 @@ import traceback
 import datetime
 import sys
 import os
-
+import argparse
 from subprocess import check_output, PIPE
 
 def chrome_driver_installer_menu(): # auto updating or installing chrome driver
@@ -77,6 +79,16 @@ if __name__ == '__main__':
         if '--cli' in sys.argv:
             sys.argv.append('--force')
         driver = None
+        parser = argparse.ArgumentParser()
+        parser.add_argument('--token', type=str, help='Token value')
+        parser.add_argument('--channelID', type=int, help='ID value')
+        # Parse the command-line arguments
+        args = parser.parse_args()
+
+        # Retrieve the values
+        token_value = args.token
+        id_value = args.channelID
+        bot = telebot.TeleBot("token_value", parse_mode='MARKDOWN')
         if '--firefox' in sys.argv:
             driver = shared_tools.initSeleniumWebDriver('firefox')
         else:
@@ -105,7 +117,7 @@ if __name__ == '__main__':
             EsetKeyG = eset_keygen.EsetKeygen(email_obj, driver)
             EsetKeyG.sendRequestForKey()
             license_name, license_out_date, license_key = EsetKeyG.getLicenseData()
-            output_line = f'\nLicense Name: {license_name}\nLicense Out Date: {license_out_date}\nLicense Key: {license_key}\n'
+            output_line = f'\n🔸 Product: ||{license_name}||\n🕐 Expire: ||{license_out_date}||\n🔐 License: `{license_key}`\n'
             output_filename = 'ESET KEYS.txt'
         logger.console_log(output_line)
         date = datetime.datetime.now()
