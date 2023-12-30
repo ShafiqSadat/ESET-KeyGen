@@ -81,7 +81,7 @@ if __name__ == '__main__':
         driver = None
         parser = argparse.ArgumentParser()
         parser.add_argument('--token', type=str, help='Token value')
-        parser.add_argument('--channelID', type=int, help='ID value')
+        parser.add_argument('--channelID', type=str, help='ID value')
         # Parse the command-line arguments
         args = parser.parse_args()
 
