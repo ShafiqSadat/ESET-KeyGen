@@ -141,5 +141,5 @@ if __name__ == '__main__':
         if str(type(E)).find('selenium') and traceback_string.find('Stacktrace:') != -1: # disabling stacktrace output
             traceback_string = traceback_string.split('Stacktrace:', 1)[0]
         logger.console_log(traceback_string, logger.ERROR)
-    if cli_value is True:
+    if cli_value is False:
         input('Press Enter...')
