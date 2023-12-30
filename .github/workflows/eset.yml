@@ -21,7 +21,7 @@ jobs:
         run: |
           ACCOUNT=${{ github.event.inputs.account }}
           KEY=${{ github.event.inputs.key }}
-          git clone https://github.com/rzc0d3r/ESET-KeyGen.git
+          git clone https://github.com/ShafiqSadat/ESET-KeyGen.git
           cd ESET-KeyGen
           sudo apt update
           sudo apt install python3-pip
@@ -29,11 +29,11 @@ jobs:
           if [[ ${ACCOUNT} != 0 ]]
           then
           #Initialise chrome driver on 1st run
-          python3 main.py --account --cli
+          python3 main.py --account --cli --token=$ENV:TOKEN --channelID=$ENV:CHANNEL
           if [[ ${ACCOUNT} != 1 ]]
           then
           #Subsequent runs in parallel
-          seq 1 $((ACCOUNT - 1)) | xargs -I {} -P $((ACCOUNT - 1)) python3 main.py --account --cli
+          seq 1 $((ACCOUNT - 1)) | xargs -I {} -P $((ACCOUNT - 1)) python3 main.py --account --cli --token=$ENV:TOKEN --channelID=$ENV:CHANNEL
           fi
           echo "Account:" >> $GITHUB_STEP_SUMMARY
           cat ./*ACCOUNTS.txt >> $GITHUB_STEP_SUMMARY
@@ -41,11 +41,11 @@ jobs:
           if [[ ${KEY} != 0 ]]
           then
           #Initialise chrome driver on 1st run
-          python3 main.py --cli
+          python3 main.py --cli --token=$ENV:TOKEN --channelID=$ENV:CHANNEL
           if [[ ${KEY} != 1 ]]
           then
           #Subsequent runs in parallel
-          seq 1 $((KEY - 1)) | xargs -I {} -P $((KEY - 1)) python3 main.py --cli
+          seq 1 $((KEY - 1)) | xargs -I {} -P $((KEY - 1)) python3 main.py --cli --token=$ENV:TOKEN --channelID=$ENV:CHANNEL
           fi
           echo -e "\nKey:" >> $GITHUB_STEP_SUMMARY
           cat ./*KEYS.txt >> $GITHUB_STEP_SUMMARY
