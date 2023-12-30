@@ -75,24 +75,25 @@ def chrome_driver_installer_menu(): # auto updating or installing chrome driver
 
 if __name__ == '__main__':
     logger.console_log(LOGO)
-    cli_value = False
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--token', type=str, help='Token value')
+    parser.add_argument('--channelID', type=str, help='ID value')
+    parser.add_argument('--cli', type=bool, help='cli value')
+    parser.add_argument('--bot', type=bool, help='bot value')
+    parser.add_argument('--account', type=bool, help='account value')
+    # Parse the command-line arguments
+    args = parser.parse_args()
+
+    # Retrieve the values
+    token_value = args.token
+    id_value = args.channelID
+    is_bot = args.bot
+    cli = args.cli
+    cli_value = not cli
     try:
         driver = None
-        parser = argparse.ArgumentParser()
-        parser.add_argument('--token', type=str, help='Token value')
-        parser.add_argument('--channelID', type=str, help='ID value')
-        parser.add_argument('--cli', type=bool, help='cli value')
-        parser.add_argument('--bot', type=bool, help='bot value')
-        parser.add_argument('--account', type=bool, help='account value')
-        # Parse the command-line arguments
-        args = parser.parse_args()
-
-        # Retrieve the values
-        token_value = args.token
-        id_value = args.channelID
-        is_bot = args.bot
-        cli = args.cli
-        cli_value = cli
+        if cli is True:
+            cli_value = True
         account = args.account
         if cli is True:
             sys.argv.append('--force')
@@ -127,14 +128,15 @@ if __name__ == '__main__':
             EsetKeyG.sendRequestForKey()
             license_name, license_out_date, license_key = EsetKeyG.getLicenseData()
             output_line = f'\n🔸 Product: ||{license_name}||\n🕐 Expire: ||{license_out_date}||\n🔐 License: `{license_key}`\n'
+            output_line1 = f'\n Product: {license_name}\n Expire: {license_out_date}\n License: {license_key}\n'
             output_filename = 'ESET KEYS.txt'
             if is_bot is True:
                 bot.send_message(-1001219056300, output_line + "@LicenseForAll")
         logger.console_log(output_line)
         date = datetime.datetime.now()
-        # f = open(f"{str(date.day)}.{str(date.month)}.{str(date.year)} - "+output_filename, 'a')
-        # f.write(output_line)
-        # f.close()
+        f = open(f"{str(date.day)}.{str(date.month)}.{str(date.year)} - "+output_filename, 'a')
+        f.write(output_line1)
+        f.close()
         driver.quit()
     except Exception as E:
         traceback_string = traceback.format_exc()
