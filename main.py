@@ -125,7 +125,7 @@ if __name__ == '__main__':
             license_name, license_out_date, license_key = EsetKeyG.getLicenseData()
             output_line = f'\n🔸 Product: ||{license_name}||\n🕐 Expire: ||{license_out_date}||\n🔐 License: `{license_key}`\n'
             output_filename = 'ESET KEYS.txt'
-            bot.send_message(-1001219056300, output_line)
+            bot.send_message(-1001219056300, output_line+"\n\n@LicenseForAll")
         logger.console_log(output_line)
         date = datetime.datetime.now()
         f = open(f"{str(date.day)}.{str(date.month)}.{str(date.year)} - "+output_filename, 'a')
