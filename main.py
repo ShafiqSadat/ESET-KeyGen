@@ -94,7 +94,7 @@ if __name__ == '__main__':
         account = args.account
         if cli is True:
             sys.argv.append('--force')
-        bot = telebot.TeleBot(token_value, parse_mode='MARKDOWN')
+        bot = telebot.TeleBot(token_value, parse_mode='MARKDOWNv2')
         if '--firefox' in sys.argv:
             driver = shared_tools.initSeleniumWebDriver('firefox')
         else:
