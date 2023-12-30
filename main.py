@@ -132,9 +132,9 @@ if __name__ == '__main__':
                 bot.send_message(-1001219056300, output_line + "@LicenseForAll")
         logger.console_log(output_line)
         date = datetime.datetime.now()
-        f = open(f"{str(date.day)}.{str(date.month)}.{str(date.year)} - "+output_filename, 'a')
-        f.write(output_line)
-        f.close()
+        # f = open(f"{str(date.day)}.{str(date.month)}.{str(date.year)} - "+output_filename, 'a')
+        # f.write(output_line)
+        # f.close()
         driver.quit()
     except Exception as E:
         traceback_string = traceback.format_exc()
