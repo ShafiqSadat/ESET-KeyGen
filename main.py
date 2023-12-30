@@ -82,6 +82,7 @@ if __name__ == '__main__':
         parser.add_argument('--token', type=str, help='Token value')
         parser.add_argument('--channelID', type=str, help='ID value')
         parser.add_argument('--cli', type=bool, help='cli value')
+        parser.add_argument('--bot', type=bool, help='bot value')
         parser.add_argument('--account', type=bool, help='account value')
         # Parse the command-line arguments
         args = parser.parse_args()
@@ -89,12 +90,14 @@ if __name__ == '__main__':
         # Retrieve the values
         token_value = args.token
         id_value = args.channelID
+        is_bot = args.bot
         cli = args.cli
         cli_value = cli
         account = args.account
         if cli is True:
             sys.argv.append('--force')
-        bot = telebot.TeleBot(token_value, parse_mode='MARKDOWNv2')
+        if is_bot is True:
+            bot = telebot.TeleBot(token_value, parse_mode='MARKDOWNv2')
         if '--firefox' in sys.argv:
             driver = shared_tools.initSeleniumWebDriver('firefox')
         else:
@@ -125,7 +128,8 @@ if __name__ == '__main__':
             license_name, license_out_date, license_key = EsetKeyG.getLicenseData()
             output_line = f'\n🔸 Product: ||{license_name}||\n🕐 Expire: ||{license_out_date}||\n🔐 License: `{license_key}`\n'
             output_filename = 'ESET KEYS.txt'
-            bot.send_message(-1001219056300, output_line+"\n\n@LicenseForAll")
+            if is_bot is True:
+                bot.send_message(-1001219056300, output_line + "\n@LicenseForAll")
         logger.console_log(output_line)
         date = datetime.datetime.now()
         f = open(f"{str(date.day)}.{str(date.month)}.{str(date.year)} - "+output_filename, 'a')
