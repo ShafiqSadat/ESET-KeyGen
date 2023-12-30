@@ -75,6 +75,7 @@ def chrome_driver_installer_menu(): # auto updating or installing chrome driver
 
 if __name__ == '__main__':
     logger.console_log(LOGO)
+    cli_value = False
     try:
         driver = None
         parser = argparse.ArgumentParser()
@@ -89,6 +90,7 @@ if __name__ == '__main__':
         token_value = args.token
         id_value = args.channelID
         cli = args.cli
+        cli_value = cli
         account = args.account
         if cli is True:
             sys.argv.append('--force')
@@ -135,5 +137,5 @@ if __name__ == '__main__':
         if str(type(E)).find('selenium') and traceback_string.find('Stacktrace:') != -1: # disabling stacktrace output
             traceback_string = traceback_string.split('Stacktrace:', 1)[0]
         logger.console_log(traceback_string, logger.ERROR)
-    if '--cli' not in sys.argv:
+    if cli_value is False:
         input('Press Enter...')
