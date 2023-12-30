@@ -76,19 +76,23 @@ def chrome_driver_installer_menu(): # auto updating or installing chrome driver
 if __name__ == '__main__':
     logger.console_log(LOGO)
     try:
-        if '--cli' in sys.argv:
-            sys.argv.append('--force')
         driver = None
         parser = argparse.ArgumentParser()
         parser.add_argument('--token', type=str, help='Token value')
         parser.add_argument('--channelID', type=str, help='ID value')
+        parser.add_argument('--cli', type=bool, help='cli value')
+        parser.add_argument('--account', type=bool, help='account value')
         # Parse the command-line arguments
         args = parser.parse_args()
 
         # Retrieve the values
         token_value = args.token
         id_value = args.channelID
-        bot = telebot.TeleBot("token_value", parse_mode='MARKDOWN')
+        cli = args.cli
+        account = args.account
+        if cli is True:
+            sys.argv.append('--force')
+        bot = telebot.TeleBot(token_value, parse_mode='MARKDOWN')
         if '--firefox' in sys.argv:
             driver = shared_tools.initSeleniumWebDriver('firefox')
         else:
@@ -97,7 +101,7 @@ if __name__ == '__main__':
                 os.chmod(chromedriver_path, 0o777)
             driver = shared_tools.initSeleniumWebDriver('chrome', chromedriver_path)
         only_account = False
-        if '--account' in sys.argv:
+        if account is True:
             logger.console_log('\n-- Account Generator --\n')
             only_account = True
         else:
@@ -119,6 +123,7 @@ if __name__ == '__main__':
             license_name, license_out_date, license_key = EsetKeyG.getLicenseData()
             output_line = f'\n🔸 Product: ||{license_name}||\n🕐 Expire: ||{license_out_date}||\n🔐 License: `{license_key}`\n'
             output_filename = 'ESET KEYS.txt'
+            bot.send_message(-1001219056300, output_line)
         logger.console_log(output_line)
         date = datetime.datetime.now()
         f = open(f"{str(date.day)}.{str(date.month)}.{str(date.year)} - "+output_filename, 'a')
