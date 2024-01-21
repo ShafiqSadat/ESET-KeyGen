@@ -109,21 +109,24 @@ if __name__ == '__main__':
     cli = args.cli
     cli_value = not cli
     try:
-        driver = None
         if cli is True:
             cli_value = True
         account = args.account
-        if cli is True:
-            sys.argv.append('--force')
         if is_bot is True:
             bot = telebot.TeleBot(token_value, parse_mode='MARKDOWNv2')
+        driver = None
+        webdriver_path = None
+        browser_name = 'chrome'
         if '--firefox' in sys.argv:
-            driver = shared_tools.initSeleniumWebDriver('firefox')
-        else:
-            chromedriver_path = chrome_driver_installer_menu()
-            if chromedriver_path is not None:
-                os.chmod(chromedriver_path, 0o777)
-            driver = shared_tools.initSeleniumWebDriver('chrome', chromedriver_path)
+            browser_name = 'firefox'
+        if '--edge' in sys.argv:
+            browser_name = 'edge'
+        if '--skip-webdriver-menu' not in sys.argv and browser_name != 'firefox':
+            webdriver_path = webdriver_installer_menu('--edge' in sys.argv)
+            if webdriver_path is not None:
+                os.chmod(webdriver_path, 0o777)
+        driver = shared_tools.initSeleniumWebDriver(browser_name, webdriver_path,
+                                                    headless=('--no-headless' not in sys.argv))
         only_account = False
         if account is True:
             logger.console_log('\n-- Account Generator --\n')
