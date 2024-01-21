@@ -79,8 +79,8 @@ def webdriver_installer_menu(edge=False): # auto updating or installing google c
             if webdriver_installer.download_webdriver('.', driver_url, edge):
                 logger.console_log('{0} webdriver was successfully downloaded and unzipped!'.format(browser_name), logger.OK)
                 webdriver_path = os.path.join(os.getcwd(), webdriver_name)
-                if '--force' not in sys.argv:
-                    input('\nPress Enter to continue...')
+                # if '--force' not in sys.argv:
+                #     input('\nPress Enter to continue...')
             else:
                 logger.console_log('Error downloading or unpacking!', logger.ERROR)
                 if '--force' not in sys.argv:
