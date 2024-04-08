@@ -865,6 +865,7 @@ if __name__ == '__main__':
     args_browsers.add_argument('--edge', action='store_true', help='Launching the project via Microsoft Edge browser')
     ## Modes of operation
     args_modes = args_parser.add_mutually_exclusive_group(required=True)
+    args_modes.add_argument('--token', type=str, help='Token value')
     args_modes.add_argument('--key', action='store_true', help='Generating an ESET-HOME license key (example as AGNV-XA2V-EA89-U546-UVJP)')
     args_modes.add_argument('--account', action='store_true', help='Generating an ESET HOME Account (To activate the free trial version)')
     args_modes.add_argument('--business-account', action='store_true', help='Generating an ESET BUSINESS Account (To huge businesses) - Requires manual captcha input!!!')
@@ -975,6 +976,7 @@ if __name__ == '__main__':
             EsetReg.confirmAccount()
             output_line = f'\nEmail: {email_obj.email}\nPassword: {eset_password}\n'
             output_filename = 'ESET ACCOUNTS.txt'
+            token_value = args.token
             bot = telebot.TeleBot(token_value, parse_mode='MARKDOWNv2')
             if args['key']:
                 output_filename = 'ESET KEYS.txt'
