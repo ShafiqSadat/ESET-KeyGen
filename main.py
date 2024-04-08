@@ -976,7 +976,7 @@ if __name__ == '__main__':
             EsetReg.confirmAccount()
             output_line = f'\nEmail: {email_obj.email}\nPassword: {eset_password}\n'
             output_filename = 'ESET ACCOUNTS.txt'
-            token_value = args.token
+            token_value = args['token']
             bot = telebot.TeleBot(token_value, parse_mode='MARKDOWNv2')
             if args['key']:
                 output_filename = 'ESET KEYS.txt'
