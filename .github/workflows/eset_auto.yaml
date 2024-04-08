@@ -30,8 +30,8 @@ jobs:
     steps:
       - name: Generate key
         run: |
-          KEY = 2
-          MAIL = 1secmail
+          KEY=2
+          MAIL=1secmail
           ACCOUNT=${{ github.event.inputs.account }}
           KEY=${{ github.event.inputs.key }}
           MAIL=${{ github.event.inputs.mail }}
