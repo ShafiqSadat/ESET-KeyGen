@@ -58,7 +58,7 @@ jobs:
           
           if [[ ${KEY} != 0 ]]
           then
-          seq 1 $((KEY)) | xargs -I {} -P $((KEY)) python3 main.py --chrome --token=${{ secrets.TOKEN }} --key --email-api ${MAIL} --skip-webdriver-menu
+          seq 1 $((KEY)) | xargs -I {} -P $((KEY)) python3 main.py --chrome --key --email-api ${MAIL} --token ${{ secrets.TOKEN }} --skip-webdriver-menu 
           echo -e "\nKey:" >> $GITHUB_STEP_SUMMARY
           cat ./*KEYS.txt >> $GITHUB_STEP_SUMMARY
           fi
