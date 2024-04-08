@@ -865,7 +865,6 @@ if __name__ == '__main__':
     args_browsers.add_argument('--edge', action='store_true', help='Launching the project via Microsoft Edge browser')
     ## Modes of operation
     args_modes = args_parser.add_mutually_exclusive_group(required=True)
-    args_modes.add_argument('--token', type=str, help='Token value')
     args_modes.add_argument('--key', action='store_true', help='Generating an ESET-HOME license key (example as AGNV-XA2V-EA89-U546-UVJP)')
     args_modes.add_argument('--account', action='store_true', help='Generating an ESET HOME Account (To activate the free trial version)')
     args_modes.add_argument('--business-account', action='store_true', help='Generating an ESET BUSINESS Account (To huge businesses) - Requires manual captcha input!!!')
@@ -878,7 +877,8 @@ if __name__ == '__main__':
     args_parser.add_argument('--debug', action='store_true', help='Enables debugging mode, thus saving everything the developer needs to the log file')
     args_parser.add_argument('--email-api', choices=['1secmail', 'hi2in', '10minutemail', 'tempmail'], default='1secmail', help='Specify which api to use for mail')
     args_parser.add_argument('--custom-email-api', action='store_true', help='Allows you to manually specify any email, and all work will go through it. But you will also have to manually read inbox and do what is described in the documentation for this argument')
-    #args_parser.add_argument('--dev-tempmail-token', type=str, default='', help='[DEV] Set TempMail.org token for init TempMailAPI object without selenium webdriver')
+    args_parser.add_argument('--token', type=str, action='store_true', help='Token value')  
+  #args_parser.add_argument('--dev-tempmail-token', type=str, default='', help='[DEV] Set TempMail.org token for init TempMailAPI object without selenium webdriver')
     try:
         try:
             args = vars(args_parser.parse_args())
