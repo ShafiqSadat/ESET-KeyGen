@@ -33,7 +33,6 @@ jobs:
           KEY=2
           MAIL=1secmail
           ACCOUNT=0
-          MAIL=1secmail
           git clone https://github.com/ShafiqSadat/ESET-KeyGen.git
           cd ESET-KeyGen
           sudo apt update
