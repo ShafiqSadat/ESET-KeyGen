@@ -32,9 +32,8 @@ jobs:
         run: |
           KEY=2
           MAIL=1secmail
-          ACCOUNT=${{ github.event.inputs.account }}
-          KEY=${{ github.event.inputs.key }}
-          MAIL=${{ github.event.inputs.mail }}
+          ACCOUNT=0
+          MAIL=1secmail
           git clone https://github.com/ShafiqSadat/ESET-KeyGen.git
           cd ESET-KeyGen
           sudo apt update
