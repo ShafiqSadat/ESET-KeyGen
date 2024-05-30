@@ -16,7 +16,6 @@ import time
 import sys
 import os
 import re
-import telebot
 
 LOGO = """
 ███████╗███████╗███████╗████████╗   ██╗  ██╗███████╗██╗   ██╗ ██████╗ ███████╗███╗   ██╗
@@ -877,8 +876,7 @@ if __name__ == '__main__':
     args_parser.add_argument('--debug', action='store_true', help='Enables debugging mode, thus saving everything the developer needs to the log file')
     args_parser.add_argument('--email-api', choices=['1secmail', 'hi2in', '10minutemail', 'tempmail'], default='1secmail', help='Specify which api to use for mail')
     args_parser.add_argument('--custom-email-api', action='store_true', help='Allows you to manually specify any email, and all work will go through it. But you will also have to manually read inbox and do what is described in the documentation for this argument')
-    args_parser.add_argument('--token', help='Token value')  
-  #args_parser.add_argument('--dev-tempmail-token', type=str, default='', help='[DEV] Set TempMail.org token for init TempMailAPI object without selenium webdriver')
+    #args_parser.add_argument('--dev-tempmail-token', type=str, default='', help='[DEV] Set TempMail.org token for init TempMailAPI object without selenium webdriver')
     try:
         try:
             args = vars(args_parser.parse_args())
@@ -976,15 +974,12 @@ if __name__ == '__main__':
             EsetReg.confirmAccount()
             output_line = f'\nEmail: {email_obj.email}\nPassword: {eset_password}\n'
             output_filename = 'ESET ACCOUNTS.txt'
-            token_value = args['token']
-            bot = telebot.TeleBot(token_value, parse_mode='MARKDOWNv2')
             if args['key']:
                 output_filename = 'ESET KEYS.txt'
                 EsetKeyG = EsetKeygen(email_obj, driver)
                 EsetKeyG.sendRequestForKey()
                 license_name, license_key, license_out_date = EsetKeyG.getLicenseData()
-                output_line = f'\n🔸 Product: ||{license_name}||\n🕐 Expire: ||{license_out_date}||\n🔐 License: `{license_key}`\n'
-                bot.send_message(-1001219056300, output_line + "@LicenseForAll")
+                output_line = f'\nLicense Name: {license_name}\nLicense Key: {license_key}\nLicense Out Date: {license_out_date}\n'
         
         # new generator
         elif args['business_account'] or args['business_key']:

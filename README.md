@@ -1,8 +1,22 @@
 # ESET-KeyGen
-ESET-KeyGen - Trial-Key & Account generator for ESET Antivirus (last test was on 08.04.2024 at 02:58 UTC+2)
+ESET-KeyGen - Trial-Key & Account generator for ESET Antivirus (last test was on 30.05.2024 at 04:02 UTC+3)
 
 ![](img/project_preview.png)
 
+
+---
+# If my page or project will be blocked, please refer to these links
+* My personal [Telegram](https://t.me/rzc0d3r)
+* My [private channel with archives of my projects](https://t.me/+mSAXxWA9mf1jODI6)
+
+---
+### Project files are detected as viruses by ESET, this is not true!
+To stop my project from being blocked by antivirus, add the project folder to the exclusion list:
+
+ESET -> Settings -> Advanced Setup -> Detection Engine -> Exclusions -> Detection Exclusions -> add ```full path to ESET-KeyGen-main folder```
+
+That's it!
+---
 
 ---
 ### My github page is currently blocked by ESET Antivirus, so you will not be able to access the project.
@@ -29,7 +43,7 @@ It will ask the number of accounts, keys to be generated.
 2. [How to install Chrome on Linux](https://support.google.com/chrome/answer/95346?hl=en&co=GENIE.Platform%3DDesktop#zippy=%2Clinux)
 3. [How to install Chrome on Mac](https://support.google.com/chrome/answer/95346?hl=en&co=GENIE.Platform%3DDesktop#zippy=%2Clinux%2Cmac)
 
-#### Mozilla Firefox (supported, but without auto-update)
+#### Mozilla Firefox (fully supports)
 1. [How to install Firefox on Windows](https://support.mozilla.org/en-US/kb/how-install-firefox-windows)
 2. [How to Install Firefox on Linux](https://support.mozilla.org/en-US/kb/install-firefox-linux)
 3. [How to Install Firefox on Mac](https://support.mozilla.org/en-US/kb/how-download-and-install-firefox-mac)
@@ -58,6 +72,7 @@ Delete your current ESET HOME account
 1. [Account Generator](wiki/AccountGenerator.md)
 2. [Key Generator](wiki/KeyGenerator.md)
 3. [Command Line Arguments](wiki/CommandLineArguments.md)
+4. [Updater](wiki/Updater.md)
 ---
 
 # Additional information
@@ -71,7 +86,8 @@ Delete your current ESET HOME account
    If still getting this error reinstall ESET and try again.
 6. Found an activation error under the code ecp4125, which appears when you try to activate the antivirus with an account.
    Perhaps not everyone has it error, but still try it, and if it does not work, use the keys. 
-7. You can test the argument ```--skip-webdriver-menu``` theoretically the program itself will install the browser and web driver to it!
-
+7. You can use the ``--skip-webdriver-menu`` argument, which will skip my WebDriverInstaller shell (Useful for various bugs with webdriver updates, and when using a non-standard browser like Brave or some dev-build, etc).
+   The program will also install the browser itself via selenium-manager if it is not present in your system!
+8. If you are having trouble initializing any web driver, I recommend manually specifying the path to the browser .exe file via ``--custom-browser-location``
 --- 
 ## This project exists in its current state thanks to all the people who have contributed and to all who create issues, which we solve together!

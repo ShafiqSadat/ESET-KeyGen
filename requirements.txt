@@ -3,4 +3,3 @@ requests
 colorama
 typing-extensions
 selenium_stealth
-pytelegrambotapi
