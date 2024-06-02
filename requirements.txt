@@ -2,5 +2,5 @@ selenium
 requests
 colorama
 typing-extensions
-selenium_stealth
+rich
 pytelegrambotapi
