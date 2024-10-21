@@ -365,7 +365,6 @@ def main(disable_exit=False):
                         '-------------------------------------------------',
                         ''
                     ])
-                    license_keys_formatted = "\n".join([f"KEY: {key}" for key in license_key])
                     output_line = f'\n🔸 Product: ||ESET VPN||\n🕐 Expire: ||{license_out_date}||\n🔐 License: `{license_key}`\n'
                     bot.send_message(-1001219056300, output_line + "@LicenseForAll")
                     if args['vpn_codes']:
@@ -388,7 +387,8 @@ def main(disable_exit=False):
                                 '-------------------------------------------------',
                                 ''
                             ])
-                            output_line = f'\n🔸 Product: ||{license_name}||\n🕐 Expire: ||{license_out_date}||\n🔐 License: `{vpn_codes_line}`\n'
+                            license_keys_formatted = "\n".join([f"KEY: {key}" for key in license_key])
+                            output_line = f'\n🔸 Product: ||{license_name}||\n🕐 Expire: ||{license_out_date}||\n🔐 License: `{license_keys_formatted}`\n'
                             bot.send_message(-1001219056300, output_line + "@LicenseForAll")
 
             # ESET ProtectHub
