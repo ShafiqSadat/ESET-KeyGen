@@ -387,8 +387,8 @@ def main(disable_exit=False):
                                 '-------------------------------------------------',
                                 ''
                             ])
-                            license_keys_formatted = "\n".join([f"KEY: {key}" for key in vpn_codes_line])
-                            output_line = f'\n🔸 Product: ||{license_name}||\n🕐 Expire: ||{license_out_date}||\n🔐 License: `{license_keys_formatted}`\n'
+                            license_keys_formatted = "\n".join([f"KEY: `{key}`" for key in vpn_codes_line.split(',')])
+                            output_line = f'\n🔸 Product: ||{license_name}||\n🕐 Expire: ||{license_out_date}||\n🔐 Keys: {license_keys_formatted}\n'
                             bot.send_message(-1001219056300, output_line + "@LicenseForAll")
 
             # ESET ProtectHub
