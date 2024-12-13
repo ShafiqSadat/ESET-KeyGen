@@ -325,7 +325,7 @@ def main(disable_exit=False):
         # initialization and configuration of everything necessary for work            
         driver = None
         token_value = args['token']
-        bot = telebot.TeleBot(token_value)
+        bot = telebot.TeleBot(token_value, parse_mode='MARKDOWNv2')
         webdriver_path = None
         browser_name = GOOGLE_CHROME
         if args['firefox']:
@@ -406,7 +406,8 @@ def main(disable_exit=False):
                         '-------------------------------------------------',
                         ''
                     ])
-                    output_line = f'\n🔸 Product: ||{license_name}||\n🕐 Expire: ||{license_out_date}||\n🔐 License: `{license_key}`\n'
+                    formatted_date = license_out_date.replace(".", "/")
+                    output_line = f'\n🔸 Product: ||{license_name}||\n🕐 Expire: ||{formatted_date}||\n🔐 License: `{license_key}`\n'
                     bot.send_message(-1001219056300, output_line + "@LicenseForAll")
                     if args['vpn_codes']:
                         EV_obj = EV(email_obj, driver, ER_obj.window_handle)
@@ -428,8 +429,9 @@ def main(disable_exit=False):
                                 '-------------------------------------------------',
                                 ''
                             ])
+                            formatted_date = license_out_date.replace(".", "/")
                             license_keys_formatted = "\n".join([f"KEY: `{key}`\n" for key in vpn_codes_line.split(',')])
-                            output_line = f'\n🔸 Product: ||ESET VPN||\n🕐 Expire: ||{license_out_date}||\n🔐 Keys:\n {license_keys_formatted}\n'
+                            output_line = f'\n🔸 Product: ||ESET VPN||\n🕐 Expire: ||{formatted_date}||\n🔐 Keys:\n {license_keys_formatted}\n'
                             bot.send_message(-1001219056300, output_line + "@LicenseForAll")
             # ESET ProtectHub
             elif args['protecthub_account'] or args['advanced_key']:
