@@ -325,7 +325,7 @@ def main(disable_exit=False):
         # initialization and configuration of everything necessary for work            
         driver = None
         token_value = args['token']
-        bot = telebot.TeleBot(token_value, parse_mode='MARKDOWNv2')
+        bot = telebot.TeleBot(token_value)
         webdriver_path = None
         browser_name = GOOGLE_CHROME
         if args['firefox']:
