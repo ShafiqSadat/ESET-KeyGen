@@ -48,6 +48,17 @@ PARSE_MAILTICKING_INBOX = """function MailTickingParse() {
     return inbox;
 }
 return MailTickingParse()"""
+PARSE_FAKEMAIL_INBOX = """
+let raw_inbox = Array.from(document.getElementById('schranka').children).slice(0, -3)
+let inbox = []
+for(let i=0; i < raw_inbox.length; i++) {
+    let id = raw_inbox[i].dataset.href
+    let from = raw_inbox[i].children[0].children[1].tagName.toLowerCase()
+    let subject = raw_inbox[i].children[1].innerText.trim()
+    inbox.push([id, from, subject])
+}
+return inbox
+"""
 
 class OneSecEmailAPI:
     def __init__(self):
@@ -74,6 +85,7 @@ class OneSecEmailAPI:
     
     def read_email(self):
         url = f'{self.__api}?action=getMessages&login={self.__login}&domain={self.__domain}'
+        print(url)
         try:
             r = requests.get(url)
         except:
@@ -84,6 +96,7 @@ class OneSecEmailAPI:
     
     def get_message(self, message_id):
         url = f'{self.__api}?action=readMessage&login={self.__login}&domain={self.__domain}&id={message_id}'
+        print(url)
         try:
             r = requests.get(url)
         except:
@@ -195,10 +208,32 @@ class MailTickingAPI:
         self.driver.switch_to.window(self.window_handle)
         self.driver.get(id)
 
+class FakeMailAPI:
+    def __init__(self, driver: Chrome):
+        self.class_name = 'fakemail'
+        self.driver = driver
+        self.email = None
+        self.window_handle = None
+
+    def init(self):     
+        self.driver.get('https://www.fakemail.net')
+        self.window_handle = self.driver.current_window_handle
+        untilConditionExecute(self.driver, f'return {GET_EBID}("email").innerText != null')
+        self.email = self.driver.execute_script(f'return {GET_EBID}("email").innerText')
+    
+    def parse_inbox(self):
+        self.driver.switch_to.window(self.window_handle)
+        self.driver.get('https://www.fakemail.net')
+        inbox = self.driver.execute_script(PARSE_FAKEMAIL_INBOX)
+        return inbox
+
+    def open_mail(self, id):
+        self.driver.switch_to.window(self.window_handle)
+        self.driver.get(f'https://www.fakemail.net/email/id/{id}')
 
 class CustomEmailAPI:
     def __init__(self):
         self.class_name = 'custom'
         self.email = None
 
-WEB_WRAPPER_EMAIL_APIS_CLASSES = (GuerRillaMailAPI, MailTickingAPI)
+WEB_WRAPPER_EMAIL_APIS_CLASSES = (GuerRillaMailAPI, MailTickingAPI, FakeMailAPI)
