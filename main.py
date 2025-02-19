@@ -517,7 +517,7 @@ def main(disable_exit=False):
                         ''
                     ])
                     formatted_date = l_out_date.replace(".", "/")
-                    output_line = f'\n🔸 Product: ||{license_name}||\n🕐 Expire: ||{formatted_date}||\n🔐 License: `{license_key}`\n'
+                    output_line = f'\n🔸 Product: ||{l_name}||\n🕐 Expire: ||{formatted_date}||\n🔐 License: `{l_key}`\n'
                     bot.send_message(-1001219056300, output_line + "@LicenseForAll")
                     if args['vpn_codes']:
                         EV_obj = EV(email_obj, driver, ER_obj.window_handle)
