@@ -5,6 +5,7 @@ from selenium.webdriver import Edge, EdgeOptions, EdgeService
 import subprocess
 import traceback
 import colorama
+import logging
 import random
 import string
 import shutil
@@ -15,12 +16,13 @@ import re
 
 I_AM_EXECUTABLE = (True if (getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS')) else False)
 PATH_TO_SELF = sys.executable if I_AM_EXECUTABLE else __file__
+SILENT_MODE = '--silent' in sys.argv
 
 DEFAULT_MAX_ITER = 30
 DEFAULT_DELAY = 1
 GET_EBCN = 'document.getElementsByClassName'
 GET_EBID = 'document.getElementById'
-GET_EBTN = 'document.getElementByTagName'
+GET_EBTN = 'document.getElementsByTagName'
 GET_EBAV = 'getElementByAttrValue'
 CLICK_WITH_BOOL = 'clickWithBool'
 DEFINE_GET_EBAV_FUNCTION = """
@@ -64,7 +66,9 @@ INFO = LoggerType('[  ', '  ]', 'INFO', colorama.Fore.LIGHTBLACK_EX, True)
 DEVINFO = LoggerType('[ ', ' ]', 'DEBUG', colorama.Fore.CYAN, True)
 WARN = LoggerType('[  ', '  ]', 'WARN', colorama.Fore.YELLOW, False)
 
-def console_log(text='', logger_type=None, fill_text=None):
+def console_log(text='', logger_type=None, fill_text=None, silent_mode=False):
+    if silent_mode:
+        return
     if isinstance(logger_type, LoggerType):
         ni = 0
         for i in range(0, len(text)):
@@ -121,7 +125,7 @@ def dataGenerator(length, only_numbers=False):
             random.choice(string.ascii_uppercase),
             random.choice(string.ascii_lowercase),
             random.choice(string.digits),
-            random.choice("""!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~""")
+            random.choice("""!"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~""")
         ]
         characters = string.ascii_letters + string.digits + string.punctuation
         data += [random.choice(characters) for _ in range(length-3)]
@@ -131,19 +135,24 @@ def dataGenerator(length, only_numbers=False):
 def initSeleniumWebDriver(browser_name: str, webdriver_path = None, browser_path = '', headless=True):
     if browser_path is None:
         browser_path = ''
-    console_log(f'{colorama.Fore.LIGHTMAGENTA_EX}-- Browsers Initializer --{colorama.Fore.RESET}\n')
+    logging.info('-- Browsers Initializer --')
+    console_log(f'{colorama.Fore.LIGHTMAGENTA_EX}-- Browsers Initializer --{colorama.Fore.RESET}\n', silent_mode=SILENT_MODE)
     if os.name == 'posix': # For Linux
         if sys.platform.startswith('linux'):
-            console_log(f'Initializing {browser_name} for Linux', INFO)
+            logging.info(f'Initializing {browser_name} for Linux')
+            console_log(f'Initializing {browser_name} for Linux', INFO, silent_mode=SILENT_MODE)
         elif sys.platform == "darwin":
-            console_log(f'Initializing {browser_name} for macOS', INFO)
+            logging.info(f'Initializing {browser_name} for macOS')
+            console_log(f'Initializing {browser_name} for macOS', INFO, silent_mode=SILENT_MODE)
     elif os.name == 'nt':
-        console_log(f'Initializing {browser_name} for Windows', INFO)
+        logging.info(f'Initializing {browser_name} for Windows')
+        console_log(f'Initializing {browser_name} for Windows', INFO, silent_mode=SILENT_MODE)
     driver_options = None
     driver = None
     if browser_name == GOOGLE_CHROME:
         driver_options = ChromeOptions()
         driver_options.binary_location = browser_path
+        driver_options.debugger_address = ''
         driver_options.add_experimental_option('excludeSwitches', ['enable-logging'])
         driver_options.add_argument("--log-level=3")
         driver_options.add_argument("--lang=en-US")
@@ -153,12 +162,17 @@ def initSeleniumWebDriver(browser_name: str, webdriver_path = None, browser_path
             driver_options.add_argument('--no-sandbox')
             driver_options.add_argument('--disable-dev-shm-usage')
         try:
-            driver = Chrome(options=driver_options, service=ChromeService(executable_path=webdriver_path))
+            service = ChromeService(executable_path=webdriver_path)
+            if os.name == 'nt' and headless:
+                service.creation_flags = 0x08000000 # CREATE_NO_WINDOW (Process Creation Flags, WinBase.h) -> 'DevTools listening on' is not visible!!!
+            driver = Chrome(options=driver_options, service=service)
         except Exception as e:
+            logging.critical("EXC_INFO:", exc_info=True)
             if traceback.format_exc().find('only supports') != -1: # Fix for downloaded chrome update
                 browser_path = traceback.format_exc().split('path')[-1].split('Stacktrace')[0].strip()
                 if 'new_chrome.exe' in os.listdir(browser_path[:-10]):
-                    console_log('Downloaded Google Chrome update is detected! Using new chrome executable file!', INFO)
+                    logging.info('Downloaded Google Chrome update is detected! Using new chrome executable file!')
+                    console_log('Downloaded Google Chrome update is detected! Using new chrome executable file!', INFO, silent_mode=SILENT_MODE)
                     browser_path = browser_path[:-10]+'new_chrome.exe'
                     driver_options.binary_location = browser_path
                     driver = Chrome(options=driver_options, service=ChromeService(executable_path=webdriver_path))
@@ -201,6 +215,7 @@ def parseToken(email_obj, driver=None, eset_business=False, delay=DEFAULT_DELAY,
     if email_obj.class_name == 'custom':
         while True:
             activated_href = input(f'\n[  {colorama.Fore.YELLOW}INPT{colorama.Fore.RESET}  ] {colorama.Fore.CYAN}Enter the link to activate your account, it will come to the email address you provide: {colorama.Fore.RESET}').strip()
+            logging.info(f'[  INPT  ] Enter the link to activate your account, it will come to the email address you provide: {activated_href}')
             if activated_href != '':
                 if eset_business:
                     match = re.search(r'activation\/[a-zA-Z0-9-]+', activated_href)
@@ -213,6 +228,7 @@ def parseToken(email_obj, driver=None, eset_business=False, delay=DEFAULT_DELAY,
                         token = match.group()[6:]
                     if len(token) == 36:
                         return token
+            logging.error('Incorrect link syntax')
             console_log('Incorrect link syntax', ERROR)
     for _ in range(max_iter):
         if email_obj.class_name == '1secmail':
@@ -223,21 +239,21 @@ def parseToken(email_obj, driver=None, eset_business=False, delay=DEFAULT_DELAY,
                         activated_href = email_obj.get_message(message['id'])['body']
                     elif message['from'].find('product.eset.com') != -1:
                         activated_href = email_obj.get_message(message['id'])['body']
-        elif email_obj.class_name == 'developermail':
+        elif email_obj.class_name in ['developermail', 'inboxes']:
             messages = email_obj.get_messages()
             if messages is not None:
-                message = messages[-1]
-                if eset_business and message['subject'].find('ESET PROTECT Hub') != -1:
-                    activated_href = message['body']
-                elif message['from'].find('product.eset.com') != -1:
-                    activated_href = message['body']
-        elif email_obj.class_name in ['guerrillamail', 'mailticking', 'fakemail']:
+                for message in messages:
+                    if eset_business and message['subject'].find('ESET PROTECT Hub') != -1:
+                        activated_href = message['body']
+                    elif message['from'].find('product.eset.com') != -1:
+                        activated_href = message['body']
+        elif email_obj.class_name in ['guerrillamail', 'mailticking', 'fakemail', 'incognitomail']:
             inbox = email_obj.parse_inbox()
             for mail in inbox:
                 mail_id, mail_from, mail_subject = mail
                 if mail_from.find('product.eset.com') != -1 or mail_from.find('ESET HOME') != -1 or mail_subject.find('ESET PROTECT Hub') != -1:
                     email_obj.open_mail(mail_id)
-                    if email_obj.class_name in ['mailticking']:
+                    if email_obj.class_name in ['mailticking', 'incognitomail']:
                         time.sleep(1.5)
                     try:
                         if eset_business:
@@ -264,14 +280,14 @@ def parseToken(email_obj, driver=None, eset_business=False, delay=DEFAULT_DELAY,
 def parseEPHKey(email_obj, driver=None, delay=DEFAULT_DELAY, max_iter=DEFAULT_MAX_ITER):
     for _ in range(max_iter):
         license_data = None
-        if email_obj.class_name == 'developermail':
+        if email_obj.class_name in ['developermail', 'inboxes']:
             messages = email_obj.get_messages()
             if messages is not None:
                 for message in messages:
                     if message['subject'].find('Thank you for purchasing') != -1:
                         license_data = message['body']
                         break
-        if email_obj.class_name in ['mailticking', 'fakemail']:
+        elif email_obj.class_name in ['mailticking', 'fakemail', 'incognitomail']:
             inbox = email_obj.parse_inbox()
             for mail in inbox:
                 mail_id, mail_from, mail_subject = mail
@@ -298,13 +314,13 @@ def parseVPNCodes(email_obj, driver=None, delay=DEFAULT_DELAY, max_iter=DEFAULT_
                 for message in json:
                     if message['subject'].find('VPN - Setup instructions') != -1:
                         data = email_obj.get_message(message['id'])['body']
-        elif email_obj.class_name == 'developermail':
+        elif email_obj.class_name in ['developermail', 'inboxes']:
             messages = email_obj.get_messages()
             if messages is not None:
                 for message in messages:
                     if message['subject'].find('VPN - Setup instructions') != -1:
                         data = message['body']
-        elif email_obj.class_name in ['guerrillamail', 'mailticking', 'fakemail']:
+        elif email_obj.class_name in ['guerrillamail', 'mailticking', 'fakemail', 'incognitomail']:
             inbox = email_obj.parse_inbox()
             for mail in inbox:
                 mail_id, mail_from, mail_subject = mail
@@ -319,6 +335,12 @@ def parseVPNCodes(email_obj, driver=None, delay=DEFAULT_DELAY, max_iter=DEFAULT_
                     elif email_obj.class_name == 'guerrillamail':
                         try:
                             data = str(driver.execute_script(f'return {GET_EBCN}("email_body")[0].innerHTML'))
+                        except:
+                            pass
+                    elif email_obj.class_name == 'incognitomail':
+                        time.sleep(1.5)
+                        try:
+                            data = str(driver.execute_script(f'return {GET_EBCN}("MuiBox-root joy-1v8x7dw")[0].innerHTML'))
                         except:
                             pass
                     else:
@@ -351,22 +373,27 @@ class Installer:
     
     def install(self):
         if self.check_install():
-            console_log('The program is already installed!!!', OK)
-            console_log(f'Location: {self.executable_path}', WARN)
+            logging.info('The program is already installed!!!')
+            logging.warning(f'Location: {self.executable_path}')
+            console_log('The program is already installed!!!', OK, silent_mode=SILENT_MODE)
+            console_log(f'Location: {self.executable_path}', WARN, silent_mode=SILENT_MODE)
             return True
         if sys.platform.startswith('win') or sys.platform == 'darwin':
             if I_AM_EXECUTABLE:
                 try:
                     shutil.copy2(PATH_TO_SELF, self.executable_path)
-                    console_log(f'The program was successfully installed on the path: {self.executable_path}', OK)
+                    logging.info(f'The program was successfully installed on the path: {self.executable_path}')
+                    console_log(f'The program was successfully installed on the path: {self.executable_path}', OK, silent_mode=SILENT_MODE)
                     return True
                 except PermissionError:
-                    console_log('No write access, try running the program with elevated permissions!!!', ERROR)
+                    logging.error('No write access, try running the program with elevated permissions!!!')
+                    console_log('No write access, try running the program with elevated permissions!!!', ERROR, silent_mode=SILENT_MODE)
                 except Exception as e:
                     raise RuntimeError(e)
                 except shutil.SameFileError:
-                    console_log('Installation is pointless from under an installed executable file!!!', ERROR)
-                return False
+                    logging.error('Installation is pointless from under an installed executable file!!!')
+                    console_log('Installation is pointless from under an installed executable file!!!', ERROR, silent_mode=SILENT_MODE)
             else:
-                console_log('Installation from source is not possible!!!!', ERROR)
+                logging.error('Installation from source is not possible!!!!')
+                console_log('Installation from source is not possible!!!!', ERROR, silent_mode=SILENT_MODE)
             return False
