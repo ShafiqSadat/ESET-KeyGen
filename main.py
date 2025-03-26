@@ -540,7 +540,7 @@ def main(disable_exit=False):
                                 ''
                             ])
                             formatted_date = l_out_date.replace(".", "/")
-                            license_keys_formatted = "\n".join([f"KEY: `{key}`\n" for key in vpn_codes_line.split(',')])
+                            license_keys_formatted = "\n".join([f"KEY: `{key.strip()}`" for key in vpn_codes_line.split(',')])
                             output_line = f'\n🔸 Product: ||ESET VPN||\n🕐 Expire: ||{formatted_date}||\n🔐 Keys:\n {license_keys_formatted}\n'
                             bot.send_message(-1001219056300, output_line + "@LicenseForAll")
 
