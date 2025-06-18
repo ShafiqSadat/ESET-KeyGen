@@ -10,6 +10,10 @@ import sys
 
 SILENT_MODE = '--silent' in sys.argv
 
+class IPBlockedException(Exception):
+    def __init__(self, message):
+        super().__init__(message)
+
 class EsetRegister(object):
     def __init__(self, registered_email_obj: OneSecEmailAPI, eset_password: str, driver: Chrome):
         self.email_obj = registered_email_obj
@@ -20,11 +24,11 @@ class EsetRegister(object):
     def createAccount(self):
         exec_js = self.driver.execute_script
         uCE = untilConditionExecute
-
+        
         logging.info('[EMAIL] Register page loading...')
         console_log('\n[EMAIL] Register page loading...', INFO, silent_mode=SILENT_MODE)
         if isinstance(self.email_obj, WEB_WRAPPER_EMAIL_APIS_CLASSES):
-            self.driver.switch_to.new_window('EsetRegister')
+            self.driver.switch_to.new_window('tab')
             self.window_handle = self.driver.current_window_handle
         self.driver.get('https://login.eset.com/Register')
         uCE(self.driver, f"return {GET_EBID}('email') != null")
@@ -50,26 +54,28 @@ class EsetRegister(object):
         logging.info('[PASSWD] Register page is loaded!')
         console_log('[PASSWD] Register page is loaded!', OK, silent_mode=SILENT_MODE)
         exec_js(f"return {GET_EBID}('password')").send_keys(self.eset_password)
+        
         # Select Ukraine country
         logging.info('Selecting the country...')
-        if exec_js(f"return {GET_EBCN}('select__single-value ltr-1dimb5e-singleValue')[0]").text != 'Ukraine':
-            exec_js(f"return {GET_EBCN}('select__control ltr-13cymwt-control')[0]").click()
-            for country in exec_js(f"return {GET_EBCN}('select__option ltr-uhiml7-option')"):
+        if exec_js(f"return {GET_EBCN}('select__single-value css-1dimb5e-singleValue')[0]").text != 'Ukraine':
+            exec_js(f"return {GET_EBCN}('select__control css-13cymwt-control')[0]").click()
+            for country in exec_js(f"return {GET_EBCN}('select__option css-uhiml7-option')"):
                 if country.text == 'Ukraine':
                     country.click()
                     logging.info('Country selected!')
                     break
-        uCE(self.driver, f"return {CLICK_WITH_BOOL}({DEFINE_GET_EBAV_FUNCTION}('button', 'data-label', 'register-create-account-button'))")
 
+        uCE(self.driver, f"return {CLICK_WITH_BOOL}({DEFINE_GET_EBAV_FUNCTION}('button', 'data-label', 'register-create-account-button'))")
+        
         for _ in range(DEFAULT_MAX_ITER):
             title = exec_js('return document.title')
             if title == 'Service not available':
-                raise RuntimeError('\nESET temporarily blocked your IP, try again later!!! TRY VPN!!!')
+                raise IPBlockedException('\nESET temporarily blocked your IP, try again later!!! Try to use VPN/Proxy or try to change Email API!!!')
             url = exec_js('return document.URL')
             if url == 'https://home.eset.com/':
                 return True
             time.sleep(DEFAULT_DELAY)
-        raise RuntimeError('\nESET temporarily blocked your IP, try again later!!! TRY VPN!!!')
+        raise IPBlockedException('\nESET temporarily blocked your IP, try again later!!! Try to use VPN/Proxy or try to change Email API!!!')
 
     def confirmAccount(self):
         uCE = untilConditionExecute
@@ -90,19 +96,16 @@ class EsetRegister(object):
         console_log(f'ESET-HOME-Token: {token}', OK, silent_mode=SILENT_MODE)
         console_log('\nAccount confirmation is in progress...', INFO, silent_mode=SILENT_MODE)
         self.driver.get(f'https://login.eset.com/link/confirmregistration?token={token}')
-        uCE(self.driver, 'return document.title === "ESET HOME"')
+        uCE(self.driver, 'return document.title.includes("ESET HOME")')
         try:
             uCE(self.driver, f'return {GET_EBCN}("verification-email_p").length === 0')
         except:
             self.driver.get(f'https://login.eset.com/link/confirmregistration?token={token}')
-            uCE(self.driver, 'return document.title === "ESET HOME"')
+            uCE(self.driver, 'return document.title.includes("ESET HOME")')
             uCE(self.driver, f'return {GET_EBCN}("verification-email_p").length === 0')
         logging.info('Account successfully confirmed!')
         console_log('Account successfully confirmed!', OK, silent_mode=SILENT_MODE)
         return True
-
-    def returnDriver(self):
-        return self.driver
 
 class EsetKeygen(object):
     def __init__(self, registered_email_obj: OneSecEmailAPI, driver: Chrome, mode='ESET HOME'):
@@ -113,7 +116,6 @@ class EsetKeygen(object):
             raise RuntimeError('Undefined keygen mode!')
         
     def sendRequestForKey(self):
-        exec_js = self.driver.execute_script
         uCE = untilConditionExecute
 
         logging.info(f'[{self.mode}] Request sending...')
@@ -187,9 +189,9 @@ class EsetVPN(object):
             if profile.get_attribute("innerText").find(self.email_obj.email) != -1: # Me profile contains an email address
                 profile.click()
         uCE(self.driver, f'return {CLICK_WITH_BOOL}({GET_EBAV}("button", "data-label", "choose-profile-continue-btn"))', max_iter=5)
-        uCE(self.driver, f'return {GET_EBAV}("ion-button", "robot", "choose-device-counter-increment-button") != null', max_iter=10)
+        uCE(self.driver, f'return {GET_EBAV}("button", "data-label", "choose-device-counter-increment-button") != null', max_iter=10)
         for _ in range(9): # increasing 'Number of devices' (to 10)
-            exec_js(f'{GET_EBAV}("ion-button", "robot", "choose-device-counter-increment-button").click()')
+            exec_js(f'{GET_EBAV}("button", "data-label", "choose-device-counter-increment-button").click()')
         exec_js(f'{GET_EBAV}("button", "data-label", "choose-device-count-submit-button").click()')
         uCE(self.driver, f'return {GET_EBAV}("button", "data-label", "pwm-instructions-sent-download-button") != null', max_iter=15)
         logging.info('Request successfully sent!')
@@ -228,7 +230,7 @@ class EsetProtectHubRegister(object):
         logging.info('Loading ESET ProtectHub Page...')
         console_log('\nLoading ESET ProtectHub Page...', INFO, silent_mode=SILENT_MODE)
         if isinstance(self.email_obj, WEB_WRAPPER_EMAIL_APIS_CLASSES):
-            self.driver.switch_to.new_window('EsetBusinessRegister')
+            self.driver.switch_to.new_window('tab')
             self.window_handle = self.driver.current_window_handle
         self.driver.get('https://protecthub.eset.com/public/registration?culture=en-US')
         uCE(self.driver, f'return {GET_EBID}("continue") != null')
@@ -267,7 +269,7 @@ class EsetProtectHubRegister(object):
             logging.info('Successfully!')
             console_log('Successfully!', OK, silent_mode=SILENT_MODE)
         except:
-            raise RuntimeError('ESET has blocked your IP or email, try again later!!! Try to use VPN or try to change Email API!!!')
+            raise IPBlockedException('\nESET temporarily blocked your IP, try again later!!! Try to use VPN/Proxy or try to change Email API!!!')
         return True
 
     def activateAccount(self):
@@ -448,20 +450,26 @@ class EsetProtectHubKeygen(object):
         try:
             self.driver.execute_script(f'return {GET_EBID}("license-actions-button")').click()
             time.sleep(1)
-            self.driver.execute_script(f'return {GET_EBID}("3-0-action_remove_license")').click()
+            button = self.driver.find_element('xpath', '//a[.//div[text()="Remove license"]]')
+            if button is not None:
+                button.click()
             untilConditionExecute(self.driver, f'return {CLICK_WITH_BOOL}({GET_EBID}("remove-license-dlg-remove-btn"))', max_iter=15)
-            self.driver.execute_script(f'return {GET_EBID}("remove-license-dlg-remove-btn")').click()
+            time.sleep(2)
             for _ in range(DEFAULT_MAX_ITER//2):
+                try:
+                    self.driver.execute_script(f'return {GET_EBID}("remove-license-dlg-remove-btn")').click()
+                except:
+                    pass
                 if self.driver.page_source.lower().find('to keep the solutions up to date') == -1:
                     time.sleep(1)
                     logging.info('Key successfully deleted!!!')
-                    console_log('Key successfully deleted!!!\n', OK, silent_mode=SILENT_MODE)
+                    console_log('Key successfully deleted!!!', OK, silent_mode=SILENT_MODE)
                     return True
                 time.sleep(DEFAULT_DELAY)
         except:
             pass
         logging.error('Failed to delete key, this error has no effect on the operation of the key!!!')
-        console_log('Failed to delete key, this error has no effect on the operation of the key!!!\n', ERROR, silent_mode=SILENT_MODE)
+        console_log('Failed to delete key, this error has no effect on the operation of the key!!!', ERROR, silent_mode=SILENT_MODE)
 
 def EsetVPNResetWindows(key_path='SOFTWARE\\ESET\\ESET VPN', value_name='authHash'):
     """Deletes the authHash value of ESET VPN"""
